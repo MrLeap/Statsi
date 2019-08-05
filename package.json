@@ -1,0 +1,14 @@
+{
+  "name": "statsi",
+  "version": "1.0.0",
+  "description": "A proxy that watches your collections and makes.. note of them..",
+  "main": "statsi.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "author": "Josh Leap",
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^0.18.1"
+  }
+}
