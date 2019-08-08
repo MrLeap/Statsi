@@ -1,6 +1,6 @@
 A proxy that watches your collections and makes.. note of them..
 
-It automatically calculates various summary statistics for arbitrary, potentially deeply nested collections for you. When making games or simulations, often times you'll want to add a new statistic to keep track of. Wouldn't it be nice if your data structures accomodated this behavior? I wrote statsi to do just that.
+Statsi automatically calculates various summary statistics for arbitrary, potentially deeply nested collections for you. When making games or simulations, often times you'll want to add a new statistic to keep track of. Wouldn't it be nice if your data structures accomodated this behavior? I wrote statsi to do just that.
 
 Other than ava for testing, Statsi doesn't have any dependencies, and I intend to keep it that way. Once I have some more time, I'll remove ava as well.
 
@@ -29,6 +29,42 @@ let player = statsi({
 
 ```
 
+
+## Examples
+
+If you run example.js, it'll launch a repl with a statsi object already instantiated. Try monkeying around with it!
+
+```js
+ > player.status
+{ health: 133,
+  strength: 5,
+  intelligence: 5,
+  agility: 5,
+  base_damage: 7,
+  block_chance: 0.3,
+  defense: 13 }
+```
+
+Lets say you've got a statsi object like the above. You want to start letting big bad boss monsters debuff your player.
+
+ > player.debuffs = [{health: {$mul: .5}}] //ouch, 50% health debuff :(
+ > player.status
+{ health: 66.5,
+  strength: 5,
+  intelligence: 5,
+  agility: 5,
+  base_damage: 7,
+  block_chance: 0.3,
+  defense: 13 }
+
+A cleanse spell might be as simple as player.debuffs = [].
+
+A dispell spell might be as simple as player.buffs = [].
+
+By default, keys with a name that start with an _, have a value that's a string or a function aren't considered by .status.
+
+
+
 ## Installation
 
 This is a [Node.js](https://nodejs.org/en/) module available through the
@@ -43,7 +79,3 @@ Installation is done using the
 ```bash
 $ npm install statsi
 ```
-
-## Philosophy
-
-Sometimes, for things like simulators and games, the data informs the processing often enough to abstract away the act of writing code to process data.

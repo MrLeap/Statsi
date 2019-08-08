@@ -100,6 +100,7 @@ var wrapObject = function(effects, options){
 		},
 		 set: function(target, prop, value, receiver){
 		 	isDirty = true;
+		 	target[prop] = value;
 		 	//TODO: scan options.triggers on set to see if any messages need to be sent.
 		 	//trigger(objectToWatch, triggerFunction, callback)
 		 	return true;
