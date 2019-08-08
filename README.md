@@ -1,9 +1,41 @@
-A proxy that watches your collections and makes.. note of them..
+Statsi automatically calculates various summary statistics for arbitrary, potentially deeply nested objects for you. As I've written games and simulations, I've wanted a data structure that would enable me to quickly prototype new features.
 
-Statsi automatically calculates various summary statistics for arbitrary, potentially deeply nested collections for you. When making games or simulations, often times you'll want to add a new statistic to keep track of. Wouldn't it be nice if your data structures accomodated this behavior? I wrote statsi to do just that.
+I wrote statsi to streamline this thought process:
 
-Other than ava for testing, Statsi doesn't have any dependencies, and I intend to keep it that way. Once I have some more time, I'll remove ava as well.
+Right now, each car as a constant speed.
 
+```js
+var car = Statsi({speed: 100})
+//car.status.speed = 100
+```
+
+I really want to adjust it based on every part on the car. I want to potentially modify it with effects I haven't even thought of yet.
+
+Just sketch it as properties of your object and statsi will cope.
+
+```js
+car.speed = 0; //Speed now comes from parts!
+car.parts = {}; //slots for parts.
+
+//Statsi ignores these names, but they give the data flavor.
+car.parts.engine = {name: "fancy turbo engine", speed: 100}
+car.parts.tires = {name: "sport tires", speed: 10}
+car.parts.fuel = {name: "high_octane_fuel", speed: {$mul: 1.05}} //5% more speed, after all additions.
+//car.status.speed is now 115.5.
+```
+
+What about a speed boost? Just add a key with the effect, delete it when it's done. Anything reading car.status.speed will get the updated value as it changes.
+
+```js
+car.nos_active = {speed: {$mul: 2}} // weeee speed is 231 now.
+setTimeout(() => {
+	delete car.nos_active;
+	//back to 115.
+}, 5000)
+
+```
+
+Here's another example that shows how to use statsi to store character data for a contrived RPG.
 
 ```js
 let statsi = require('statsi');
@@ -28,11 +60,11 @@ let player = statsi({
 });
 
 ```
+This is the same kind of thing that's in example.js.
 
+Lessons when you're designing: Does this effect get more severe every time it's applied? Put it in an array. Otherwise, object keys are often best since they're easy to overwrite and delete.
 
 ## Examples
-
-If you run example.js, it'll launch a repl with a statsi object already instantiated. Try monkeying around with it!
 
 ```js
  > player.status
@@ -45,8 +77,11 @@ If you run example.js, it'll launch a repl with a statsi object already instanti
   defense: 13 }
 ```
 
+If you run example.js, it'll launch a repl with a statsi object already instantiated. Try monkeying around with it!
+
 Lets say you've got a statsi object like the above. You want to start letting big bad boss monsters debuff your player.
 
+```js
  > player.debuffs = [{health: {$mul: .5}}] //ouch, 50% health debuff :(
  > player.status
 { health: 66.5,
@@ -56,13 +91,38 @@ Lets say you've got a statsi object like the above. You want to start letting bi
   base_damage: 7,
   block_chance: 0.3,
   defense: 13 }
+```
 
-A cleanse spell might be as simple as player.debuffs = [].
 
-A dispell spell might be as simple as player.buffs = [].
+A cleanse spell might be as simple as `player.debuffs = [].`
 
-By default, keys with a name that start with an _, have a value that's a string or a function aren't considered by .status.
+A dispell spell might be as simple as `player.buffs = [].`
 
+An antidote might look like this `player.debuffs = player.debuffs.filter((d) => {return d.name != 'poison'})`
+
+Hopefully this is giving you ideas.
+
+Since adding up the durations of all your debuffs isn't a useful statistic, It's a good idea to start the names of things like that an underscore. _duration and the like will be ignored when .status is calculated.
+
+## Options
+
+Here's a list of options you might want to customize, pass them as the second argument of your Statsi objects.
+
+**aggregateFunctionName**
+the function to get your stats. Defaults to `status`.
+
+**operations**
+If `$mul` isn't enough for you, you can add more operations here.
+
+**hide**
+A function that accepts a key and a value from your statsi objects. Defaults to this:
+
+```js
+function (k, v){
+		return (k[0] === "_" || typeof v === "string" || typeof v === "function");
+}```
+
+This is used so statsi doesn't concatonate all your names together or other such weirdness. Override it if you need more / less things ignored.
 
 
 ## Installation
@@ -79,3 +139,8 @@ Installation is done using the
 ```bash
 $ npm install statsi
 ```
+
+## TODO
+	-  Ergonomic constraints, triggers and lenses for your statsi objects.
+	-  Have greater control over the order stats are calculated for non assoiative operations.
+	-  Better performance characteristics. Storing your whole activity history for 100 entities in statsi gets unwieldy, but it shouldn't have to be.
