@@ -91,15 +91,17 @@ var wrapObject = function(effects, options){
 				stats = {}
 				buildStats(obj, stats, options);
 				//isDirty = false;
+				//TODO: need a more robust way to detect if the object has changed.
+				//The delete keyword doesn't trigger the set callback, for instance.
 			}
 			if (prop === options.aggregateFunctionName) {
 				return stats;
 			}
 		},
 		 set: function(target, prop, value, receiver){
-   			console.log('called: ' + prop + ' = ' + value);
 		 	isDirty = true;
-		 	//figure out when it's dirty?
+		 	//TODO: scan options.triggers on set to see if any messages need to be sent.
+		 	//trigger(objectToWatch, triggerFunction, callback)
 		 	return true;
 		 }
 	});
